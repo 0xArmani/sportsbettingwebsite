@@ -216,12 +216,24 @@
             // Remove the entry from the history array
             history.splice(index, 1);
 
+            // Recalculate profit/loss for each entry after deletion
+            recalculateProfitLoss();
+
             // Update the history in localStorage
             localStorage.setItem("bettingHistory", JSON.stringify(history));
 
             // Update the history table and graph
             displayHistory();
             updateGraph();
+        }
+
+        // Function to recalculate profit/loss for each entry after a deletion
+        function recalculateProfitLoss() {
+            for (let i = 1; i < history.length; i++) {
+                const prevEntry = history[i - 1];
+                const currentEntry = history[i];
+                currentEntry.profitLoss = currentEntry.balance - prevEntry.balance - currentEntry.withdrawal;
+            }
         }
 
         // Function to update the graph with new data
@@ -283,5 +295,6 @@
             updateGraph();
         });
     </script>
+
 </body>
 </html>
