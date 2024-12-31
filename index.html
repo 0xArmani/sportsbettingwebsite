@@ -4,34 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sports Betting Profit Tracker</title>
-    <!-- Link to External CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div class="container">
         <h1>Sports Betting Profit Tracker</h1>
-
         <label for="balance">Enter your ending balance for today:</label>
         <input type="number" id="balance" placeholder="Enter today's balance" />
-
         <label for="withdrawal">Enter any withdrawal amount for today (positive value):</label>
         <input type="number" id="withdrawal" placeholder="Enter withdrawal amount" />
-
-        <button id="submitButton">Submit</button>
-
+        <button onclick="submitEntry()">Submit</button>
         <div class="result" id="result"></div>
-
-        <!-- History of previous days' profit/losses -->
         <div class="history" id="history"></div>
-
-        <!-- Canvas for displaying the graph -->
         <canvas id="profitChart" width="400" height="200"></canvas>
     </div>
-
-    <!-- Link to External JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
-
 </body>
 </html>
