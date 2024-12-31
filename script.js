@@ -122,9 +122,9 @@ function updateGraph() {
     const canvas = document.getElementById("profitChart");
     const ctx = canvas.getContext("2d");
 
-    // Check if the chart already exists, if so, destroy it
-    if (window.profitChart) {
-        window.profitChart.destroy(); // Destroy the existing chart before creating a new one
+    // Destroy previous chart if it exists
+    if (window.profitChart instanceof Chart) {
+        window.profitChart.destroy(); // Destroy the previous chart
     }
 
     // Create the graph
@@ -156,6 +156,7 @@ function updateGraph() {
         }
     });
 }
+
 
 
 // Display the history and graph when the page loads
