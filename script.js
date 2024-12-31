@@ -115,10 +115,14 @@ function updateGraph() {
     const dates = history.map(entry => entry.date);
     const profits = history.map(entry => entry.profitLoss);
 
+    // Log data for debugging
+    console.log(dates, profits);
+
     // Get the canvas context
     const canvas = document.getElementById("profitChart");
     const ctx = canvas.getContext("2d");
 
+    // Destroy previous chart if it exists
     if (window.profitChart) {
         window.profitChart.destroy(); // Destroy previous chart to avoid stacking new ones
     }
