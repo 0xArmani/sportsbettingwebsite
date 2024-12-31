@@ -172,10 +172,8 @@
             document.getElementById("result").innerText = resultText;
             document.getElementById("result").className = `result ${resultClass}`;
 
-            // Update the history table
+            // Update the history table and graph immediately after submitting
             displayHistory();
-
-            // Update the graph with new data
             updateGraph();
         }
 
@@ -222,13 +220,14 @@
             // Update the history in localStorage
             localStorage.setItem("bettingHistory", JSON.stringify(history));
 
-            // Update the history table and graph
+            // Update the history table and graph immediately after deletion
             displayHistory();
             updateGraph();
         }
 
         // Function to recalculate profit/loss for each entry after a deletion
         function recalculateProfitLoss() {
+            // Start from the second entry and calculate profit/loss
             for (let i = 1; i < history.length; i++) {
                 const prevEntry = history[i - 1];
                 const currentEntry = history[i];
@@ -240,7 +239,7 @@
         function updateGraph() {
             // Check if there are any entries
             if (history.length === 0) {
-                // If no entries, clear the graph
+                // If no entries, hide the graph
                 document.getElementById("profitChart").style.display = 'none';
                 return;
             }
@@ -288,7 +287,7 @@
             document.getElementById("profitChart").style.display = 'block';
         }
 
-        // Attach event listener to the submit button once the DOM is fully loaded
+        // Event listener for submit button
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('submitButton').addEventListener('click', submitEntry);
             displayHistory();
