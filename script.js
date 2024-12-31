@@ -5,7 +5,11 @@ let history = JSON.parse(localStorage.getItem("bettingHistory")) || [];
 function submitEntry() {
     const currentBalance = parseFloat(document.getElementById("balance").value);
     const withdrawalAmount = parseFloat(document.getElementById("withdrawal").value);
-    const entryDate = document.getElementById("entryDate").value || new Date().toLocaleDateString();  // Use manual date or current date if none is provided
+
+    // Manually entered date or default to today's date if not provided
+    const entryDate = document.getElementById("entryDate").value.trim() || new Date().toISOString().split('T')[0];  // Ensure date format is YYYY-MM-DD
+
+    console.log("Entered Date:", entryDate);  // Debugging step to check the captured date
 
     // Validate the balance input
     if (isNaN(currentBalance)) {
