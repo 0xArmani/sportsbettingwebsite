@@ -226,6 +226,13 @@
 
         // Function to update the graph with new data
         function updateGraph() {
+            // Check if there are any entries
+            if (history.length === 0) {
+                // If no entries, clear the graph
+                document.getElementById("profitChart").style.display = 'none';
+                return;
+            }
+
             const dates = history.map(entry => entry.date);
             const profits = history.map(entry => entry.profitLoss);
 
@@ -264,6 +271,9 @@
                     }
                 }
             });
+
+            // Make the graph visible again if it was hidden
+            document.getElementById("profitChart").style.display = 'block';
         }
 
         // Attach event listener to the submit button once the DOM is fully loaded
