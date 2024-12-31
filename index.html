@@ -237,9 +237,8 @@
 
         // Function to update the graph with new data
         function updateGraph() {
-            // Check if there are any entries
+            // If there are no entries, hide the graph
             if (history.length === 0) {
-                // If no entries, hide the graph
                 document.getElementById("profitChart").style.display = 'none';
                 return;
             }
@@ -249,9 +248,8 @@
 
             const ctx = document.getElementById("profitChart").getContext("2d");
 
-            // Destroy the previous chart if it exists to avoid stacking new ones
             if (window.profitChart) {
-                window.profitChart.destroy();
+                window.profitChart.destroy(); // Destroy previous chart to avoid stacking new ones
             }
 
             // Create the graph
