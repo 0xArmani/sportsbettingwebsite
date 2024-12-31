@@ -70,3 +70,7 @@ button:hover {
     text-align: center;
     border: 1px solid #ddd;
 }
+
+canvas {
+    margin-top: 20px;
+}
