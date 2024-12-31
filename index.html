@@ -66,6 +66,9 @@
             text-align: center;
             border: 1px solid #ddd;
         }
+        canvas {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -85,8 +88,12 @@
 
         <!-- History of previous days' profit/losses -->
         <div class="history" id="history"></div>
+
+        <!-- Canvas for displaying the graph -->
+        <canvas id="profitChart" width="400" height="200"></canvas>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Retrieve stored history from localStorage
         let history = JSON.parse(localStorage.getItem("bettingHistory")) || [];
@@ -143,6 +150,9 @@
 
             // Update the history table
             displayHistory();
+
+            // Update the graph with new data
+            updateGraph();
         }
 
         // Function to display the history of bets
@@ -178,9 +188,51 @@
             historyTable.innerHTML = tableHTML;
         }
 
-        // Display the history when the page loads
+        // Function to update the graph with new data
+        function updateGraph() {
+            const dates = history.map(entry => entry.date);
+            const profits = history.map(entry => entry.profitLoss);
+
+            const ctx = document.getElementById("profitChart").getContext("2d");
+
+            if (window.profitChart) {
+                window.profitChart.destroy(); // Destroy previous chart to avoid stacking new ones
+            }
+
+            // Create the graph
+            window.profitChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Profit/Loss',
+                        data: profits,
+                        borderColor: profits.map(p => p >= 0 ? 'green' : 'red'),
+                        backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Sports Betting Profit/Loss Over Time'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    }
+                }
+            });
+        }
+
+        // Display the history and graph when the page loads
         window.onload = function() {
             displayHistory();
+            updateGraph();
         };
     </script>
 
