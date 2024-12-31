@@ -92,7 +92,7 @@
         <label for="withdrawal">Enter any withdrawal amount for today (positive value):</label>
         <input type="number" id="withdrawal" placeholder="Enter withdrawal amount" />
 
-        <button onclick="submitEntry()">Submit</button>
+        <button id="submitButton">Submit</button>
 
         <div class="result" id="result"></div>
 
@@ -266,4 +266,12 @@
             });
         }
 
-        // Initialize the history table and graph on page load
+        // Attach event listener to the submit button once the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('submitButton').addEventListener('click', submitEntry);
+            displayHistory();
+            updateGraph();
+        });
+    </script>
+</body>
+</html>
