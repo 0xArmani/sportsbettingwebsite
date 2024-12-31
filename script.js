@@ -1,31 +1,39 @@
+// Retrieve stored history from localStorage
 let history = JSON.parse(localStorage.getItem("bettingHistory")) || [];
 
+// Function to submit the balance entry
 function submitEntry() {
     const currentBalance = parseFloat(document.getElementById("balance").value);
     const withdrawalAmount = parseFloat(document.getElementById("withdrawal").value);
+    const entryDate = document.getElementById("entryDate").value || new Date().toLocaleDateString();  // Use manual date or current date if none is provided
 
     if (isNaN(currentBalance)) {
         alert("Please enter a valid balance.");
         return;
     }
 
+    // If the withdrawal amount is negative, treat it as 0 (no withdrawal)
     const actualWithdrawal = isNaN(withdrawalAmount) ? 0 : withdrawalAmount;
 
+    // Calculate profit or loss (compared to the last balance)
     let profitLoss = 0;
     if (history.length > 0) {
         const lastEntry = history[history.length - 1];
-        profitLoss = currentBalance - lastEntry.balance - actualWithdrawal;
+        profitLoss = currentBalance - lastEntry.balance - actualWithdrawal; // Subtract withdrawal from profit
     }
 
+    // Save the current balance, profit/loss, and withdrawal to history
     history.push({
-        date: new Date().toLocaleDateString(),
+        date: entryDate,  // Store the manually entered date
         balance: currentBalance,
         profitLoss: profitLoss,
         withdrawal: actualWithdrawal
     });
 
+    // Store updated history in localStorage
     localStorage.setItem("bettingHistory", JSON.stringify(history));
 
+    // Display result (profit or loss)
     let resultText = "";
     let resultClass = "";
 
@@ -40,13 +48,18 @@ function submitEntry() {
         resultClass = "";
     }
 
+    // Show result
     document.getElementById("result").innerText = resultText;
     document.getElementById("result").className = `result ${resultClass}`;
 
+    // Update the history table
     displayHistory();
+
+    // Update the graph with new data
     updateGraph();
 }
 
+// Function to display the history of bets
 function displayHistory() {
     const historyTable = document.getElementById("history");
     if (history.length === 0) {
@@ -61,46 +74,33 @@ function displayHistory() {
                                 <th>Balance</th>
                                 <th>Profit/Loss</th>
                                 <th>Withdrawal</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>`;
-    history.forEach((entry, index) => {
+
+    history.forEach(entry => {
         tableHTML += `<tr>
                         <td>${entry.date}</td>
                         <td>$${entry.balance.toFixed(2)}</td>
                         <td class="${entry.profitLoss >= 0 ? 'profit' : 'loss'}">$${entry.profitLoss.toFixed(2)}</td>
-                        <td>$${entry.withdrawal.toFixed(2)}</td>
-                        <td><button onclick="deleteEntry(${index})">Delete</button></td>
+                        <td class="withdrawal">$${entry.withdrawal.toFixed(2)}</td>
                       </tr>`;
     });
 
     tableHTML += "</tbody></table>";
+
     historyTable.innerHTML = tableHTML;
 }
 
-function deleteEntry(index) {
-    history.splice(index, 1);
-    localStorage.setItem("bettingHistory", JSON.stringify(history));
-    displayHistory();
-    updateGraph();
-}
-
+// Function to update the graph with new data
 function updateGraph() {
     const dates = history.map(entry => entry.date);
     const profits = history.map(entry => entry.profitLoss);
 
     const ctx = document.getElementById("profitChart").getContext("2d");
 
-    if (history.length === 0) {
-        document.getElementById("profitChart").style.display = 'none';
-        return;
-    } else {
-        document.getElementById("profitChart").style.display = 'block';
-    }
-
     if (window.profitChart) {
-        window.profitChart.destroy();
+        window.profitChart.destroy(); // Destroy previous chart to avoid stacking new ones
     }
 
     window.profitChart = new Chart(ctx, {
@@ -127,21 +127,12 @@ function updateGraph() {
                     mode: 'index',
                     intersect: false,
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return `$${value.toFixed(2)}`;
-                        }
-                    }
-                }
             }
         }
     });
 }
 
+// Display the history and graph when the page loads
 window.onload = function() {
     displayHistory();
     updateGraph();
