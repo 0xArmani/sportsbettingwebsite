@@ -7,6 +7,7 @@ function submitEntry() {
     const withdrawalAmount = parseFloat(document.getElementById("withdrawal").value);
     const entryDate = document.getElementById("entryDate").value || new Date().toLocaleDateString();  // Use manual date or current date if none is provided
 
+    // Validate the balance input
     if (isNaN(currentBalance)) {
         alert("Please enter a valid balance.");
         return;
@@ -80,7 +81,7 @@ function displayHistory() {
 
     history.forEach(entry => {
         tableHTML += `<tr>
-                        <td>${entry.date}</td>
+                        <td>${entry.date}</td> <!-- This is where the date will be displayed -->
                         <td>$${entry.balance.toFixed(2)}</td>
                         <td class="${entry.profitLoss >= 0 ? 'profit' : 'loss'}">$${entry.profitLoss.toFixed(2)}</td>
                         <td class="withdrawal">$${entry.withdrawal.toFixed(2)}</td>
