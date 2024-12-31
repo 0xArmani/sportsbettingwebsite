@@ -52,6 +52,20 @@
         .loss {
             color: red;
         }
+        .history {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .history table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .history th, .history td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
     </style>
 </head>
 <body>
@@ -62,24 +76,53 @@
         <label for="balance">Enter your ending balance for today:</label>
         <input type="number" id="balance" placeholder="Enter today's balance" />
 
-        <button onclick="calculateProfit()">Submit</button>
+        <label for="withdrawal">Enter any withdrawal amount for today (positive value):</label>
+        <input type="number" id="withdrawal" placeholder="Enter withdrawal amount" />
+
+        <button onclick="submitEntry()">Submit</button>
 
         <div class="result" id="result"></div>
+
+        <!-- History of previous days' profit/losses -->
+        <div class="history" id="history"></div>
     </div>
 
     <script>
-        // Store previous day's balance in a variable (you can make this persistent with localStorage)
-        let previousBalance = 0;  // For first-time, it will be 0 (or you can use localStorage to save it)
+        // Retrieve stored history from localStorage
+        let history = JSON.parse(localStorage.getItem("bettingHistory")) || [];
 
-        // Function to calculate profit/loss
-        function calculateProfit() {
+        // Function to submit the balance entry
+        function submitEntry() {
             const currentBalance = parseFloat(document.getElementById("balance").value);
+            const withdrawalAmount = parseFloat(document.getElementById("withdrawal").value);
+
             if (isNaN(currentBalance)) {
-                alert("Please enter a valid number.");
+                alert("Please enter a valid balance.");
                 return;
             }
 
-            const profitLoss = currentBalance - previousBalance;
+            // If the withdrawal amount is negative, treat it as 0 (no withdrawal)
+            const actualWithdrawal = isNaN(withdrawalAmount) ? 0 : withdrawalAmount;
+
+            // Calculate profit or loss (compared to the last balance)
+            let profitLoss = 0;
+            if (history.length > 0) {
+                const lastEntry = history[history.length - 1];
+                profitLoss = currentBalance - lastEntry.balance - actualWithdrawal; // Subtract withdrawal from profit
+            }
+
+            // Save the current balance, profit/loss, and withdrawal to history
+            history.push({
+                date: new Date().toLocaleDateString(),
+                balance: currentBalance,
+                profitLoss: profitLoss,
+                withdrawal: actualWithdrawal
+            });
+
+            // Store updated history in localStorage
+            localStorage.setItem("bettingHistory", JSON.stringify(history));
+
+            // Display result (profit or loss)
             let resultText = "";
             let resultClass = "";
 
@@ -94,23 +137,50 @@
                 resultClass = "";
             }
 
-            // Update the result display
+            // Show result
             document.getElementById("result").innerText = resultText;
             document.getElementById("result").className = `result ${resultClass}`;
 
-            // Update previousBalance for next time
-            previousBalance = currentBalance;
-
-            // Optionally, you can store the balance in localStorage to persist across sessions
-            localStorage.setItem('previousBalance', currentBalance);
+            // Update the history table
+            displayHistory();
         }
 
-        // Optional: Load previous balance from localStorage if it exists
-        window.onload = function() {
-            const savedBalance = localStorage.getItem('previousBalance');
-            if (savedBalance) {
-                previousBalance = parseFloat(savedBalance);
+        // Function to display the history of bets
+        function displayHistory() {
+            const historyTable = document.getElementById("history");
+            if (history.length === 0) {
+                historyTable.innerHTML = "<p>No entries yet.</p>";
+                return;
             }
+
+            let tableHTML = `<table>
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Balance</th>
+                                        <th>Profit/Loss</th>
+                                        <th>Withdrawal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+
+            history.forEach(entry => {
+                tableHTML += `<tr>
+                                <td>${entry.date}</td>
+                                <td>$${entry.balance.toFixed(2)}</td>
+                                <td class="${entry.profitLoss >= 0 ? 'profit' : 'loss'}">$${entry.profitLoss.toFixed(2)}</td>
+                                <td class="withdrawal">$${entry.withdrawal.toFixed(2)}</td>
+                              </tr>`;
+            });
+
+            tableHTML += "</tbody></table>";
+
+            historyTable.innerHTML = tableHTML;
+        }
+
+        // Display the history when the page loads
+        window.onload = function() {
+            displayHistory();
         };
     </script>
 
