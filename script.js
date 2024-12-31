@@ -9,8 +9,6 @@ function submitEntry() {
     // Manually entered date or default to today's date if not provided
     const entryDate = document.getElementById("entryDate").value.trim() || new Date().toISOString().split('T')[0];  // Ensure date format is YYYY-MM-DD
 
-    console.log("Entered Date:", entryDate);  // Debugging step to check the captured date
-
     // Validate the balance input
     if (isNaN(currentBalance)) {
         alert("Please enter a valid balance.");
@@ -117,39 +115,47 @@ function updateGraph() {
     const dates = history.map(entry => entry.date);
     const profits = history.map(entry => entry.profitLoss);
 
-    const ctx = document.getElementById("profitChart").getContext("2d");
+    // Get the canvas context
+    const canvas = document.getElementById("profitChart");
+    const ctx = canvas.getContext("2d");
 
-    if (window.profitChart) {
-        window.profitChart.destroy(); // Destroy previous chart to avoid stacking new ones
+    // Clear the previous graph
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Set graph properties
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'blue';
+
+    // Start drawing the graph
+    let xOffset = 50;  // Space for date labels
+    const yMax = Math.max(...profits);
+    const yMin = Math.min(...profits);
+
+    // Loop through the data to plot points
+    for (let i = 0; i < profits.length; i++) {
+        const x = xOffset + i * (canvas.width / profits.length);  // X-axis spacing
+        const y = canvas.height - (profits[i] - yMin) * (canvas.height / (yMax - yMin)); // Y-axis scaling
+
+        if (i === 0) {
+            ctx.moveTo(x, y);  // Move to the starting point
+        } else {
+            ctx.lineTo(x, y);  // Draw the line
+        }
     }
 
-    window.profitChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: 'Profit/Loss',
-                data: profits,
-                borderColor: profits.map(p => p >= 0 ? 'green' : 'red'),
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                borderWidth: 2,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Sports Betting Profit/Loss Over Time'
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                }
-            }
-        }
-    });
+    ctx.stroke();  // Render the line
+
+    // Optional: Add labels and title
+    ctx.fillStyle = "black";
+    ctx.font = "12px Arial";
+    ctx.fillText("Profit/Loss Over Time", canvas.width / 2 - 50, 20); // Title
+
+    // X-axis labels (dates)
+    for (let i = 0; i < dates.length; i++) {
+        const x = xOffset + i * (canvas.width / dates.length);
+        ctx.fillText(dates[i], x, canvas.height - 10); // Date below each point
+    }
 }
 
 // Display the history and graph when the page loads
