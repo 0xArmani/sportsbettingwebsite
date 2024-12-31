@@ -79,22 +79,37 @@ function displayHistory() {
                                 <th>Balance</th>
                                 <th>Profit/Loss</th>
                                 <th>Withdrawal</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>`;
 
-    history.forEach(entry => {
+    history.forEach((entry, index) => {
         tableHTML += `<tr>
-                        <td>${entry.date}</td> <!-- This is where the date will be displayed -->
+                        <td>${entry.date}</td>
                         <td>$${entry.balance.toFixed(2)}</td>
                         <td class="${entry.profitLoss >= 0 ? 'profit' : 'loss'}">$${entry.profitLoss.toFixed(2)}</td>
                         <td class="withdrawal">$${entry.withdrawal.toFixed(2)}</td>
+                        <td><button onclick="deleteEntry(${index})">Delete</button></td> <!-- Delete button -->
                       </tr>`;
     });
 
     tableHTML += "</tbody></table>";
 
     historyTable.innerHTML = tableHTML;
+}
+
+// Function to delete an entry
+function deleteEntry(index) {
+    // Remove the entry from the history array
+    history.splice(index, 1);
+
+    // Update the history in localStorage
+    localStorage.setItem("bettingHistory", JSON.stringify(history));
+
+    // Update the table and graph after deletion
+    displayHistory();
+    updateGraph();
 }
 
 // Function to update the graph with new data
