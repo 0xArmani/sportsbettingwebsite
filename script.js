@@ -47,6 +47,18 @@ function submitEntry() {
     updateGraph();
 }
 
+function deleteEntry(index) {
+    // Remove the entry at the specified index
+    history.splice(index, 1);
+
+    // Update localStorage with the modified history
+    localStorage.setItem("bettingHistory", JSON.stringify(history));
+
+    // Re-render the table and update the graph
+    displayHistory();
+    updateGraph();
+}
+
 function displayHistory() {
     const historyTable = document.getElementById("history");
     if (history.length === 0) {
@@ -61,16 +73,18 @@ function displayHistory() {
                                 <th>Balance</th>
                                 <th>Profit/Loss</th>
                                 <th>Withdrawal</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>`;
 
-    history.forEach(entry => {
+    history.forEach((entry, index) => {
         tableHTML += `<tr>
                         <td>${entry.date}</td>
                         <td>$${entry.balance.toFixed(2)}</td>
                         <td class="${entry.profitLoss >= 0 ? 'profit' : 'loss'}">$${entry.profitLoss.toFixed(2)}</td>
                         <td class="withdrawal">$${entry.withdrawal.toFixed(2)}</td>
+                        <td><button onclick="deleteEntry(${index})">Delete</button></td>
                     </tr>`;
     });
 
